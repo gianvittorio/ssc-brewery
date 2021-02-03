@@ -7,27 +7,11 @@ public class QueryParamsUsernamePasswordExtractor implements UsernamePasswordExt
     public String[] extract(HttpServletRequest request) {
         String[] ans = new String[2];
 
-        String[] queryParams = request.getQueryString().split("&");
-        if (queryParams == null || queryParams.length == 0) {
-            return ans;
-        }
+        String username = request.getParameter("Api-Key");
+        String password = request.getParameter("Api-Secret");
 
-        String username = "", password = "";
-        for (String keyValue : queryParams) {
-            String[] keyValuePair = keyValue.split("=");
-            String key = keyValuePair[0], value = keyValuePair[1];
-
-            if (key.equals("Api-Key")) {
-                username = value;
-            }
-
-            if (key.equals("Api-Secret")) {
-                password = value;
-            }
-        }
-
-        ans[0] = username;
-        ans[1] = password;
+        ans[0] = (username == null) ? ("") : (username);
+        ans[1] = (password == null) ? ("") : (password);
 
         return ans;
     }
