@@ -37,6 +37,11 @@ public class BeerOrderController {
         return beerOrderService.listOrders(customerId, PageRequest.of(pageNumber, pageSize));
     }
 
+    @PreAuthorize(
+            "hasAuthority('order.create') OR " +
+                    "hasAuthority('customer.order.create') AND " +
+                    "@beerOrderAuthenticationManager.customerIdMatches(authentication, #customerId)"
+    )
     @PostMapping("orders")
     @ResponseStatus(HttpStatus.CREATED)
     public BeerOrderDto placeOrder(@PathVariable("customerId") UUID customerId, @RequestBody BeerOrderDto beerOrderDto) {

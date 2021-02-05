@@ -180,7 +180,7 @@ public class BeerOrderControllerTest extends BaseIT {
     }
 
     @Transactional
-    @WithUserDetails(DefaultBreweryLoader.STPETE_USER)
+    @WithUserDetails(DefaultBreweryLoader.DUNEDIN_USER)
     @Test
     public void getByOrderIdCustomerNotAuth() throws Exception {
         BeerOrder beerOrder = stPeteCustomer.getBeerOrders().stream()

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,6 +48,7 @@ public class CustomerControllerIT extends BaseIT {
         @Test
         public void processCreationForm() throws Exception {
             mockMvc.perform(post("/customers/new")
+                    .with(csrf())
                     .param("customerName", "Foo Customer")
                     .with(httpBasic("spring", "guru")))
                     .andExpect(status().is3xxRedirection());
@@ -65,6 +67,7 @@ public class CustomerControllerIT extends BaseIT {
         @Test
         public void processCreationFormNOAUTH() throws Exception {
             mockMvc.perform(post("/customers/new")
+                    .with(csrf())
                     .param("customerName", "Foo Customer2"))
                     .andExpect(status().isUnauthorized());
         }
