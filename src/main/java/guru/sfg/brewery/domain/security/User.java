@@ -1,6 +1,11 @@
 package guru.sfg.brewery.domain.security;
 
+import guru.sfg.brewery.domain.Customer;
 import lombok.*;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -12,7 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails, CredentialsContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -21,14 +26,24 @@ public class User {
 
     private String password;
 
-    @Transient
-    private Set<Authority> authorities;
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
 
-    public Set<? extends Authority> getAuthorities() {
-        return this.roles.stream()
-                .map(Role::getAuthorities)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
     @Singular
@@ -39,6 +54,18 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")
     )
     private Set<Role> roles;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Customer customer;
+
+    @Transient
+    public Set<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream()
+                .map(Role::getAuthorities)
+                .flatMap(Set::stream)
+                .map(authority -> new SimpleGrantedAuthority(authority.getPermission()))
+                .collect(Collectors.toSet());
+    }
 
     @Builder.Default
     private Boolean accountNonExpired = true;
@@ -51,4 +78,9 @@ public class User {
 
     @Builder.Default
     private Boolean enabled = true;
+
+    @Override
+    public void eraseCredentials() {
+        this.password = null;
+    }
 }
