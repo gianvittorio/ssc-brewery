@@ -39,6 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(google2faFilter, SessionManagementFilter.class);
 
         http
+                .cors()
+                .and()
                 .authorizeRequests(authorize -> {
                     authorize
                             .antMatchers("/h2-console/**").permitAll() //do not use in production!
@@ -73,11 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //h2 console config
         http.headers().frameOptions().sameOrigin();
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return SfgPasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 // @Override
